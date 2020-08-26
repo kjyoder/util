@@ -1,0 +1,88 @@
+---
+title: "Mixed models"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+# Mixed models in R
+Showing similarities between `aov_car`, `aov_4`, and `mixed` from the `afex` package and `lme4()` from the `lme4` package. 
+
+```{r setup, include=FALSE}
+require(tidyverse)
+require(afex)
+require(emmeans)
+```
+
+## Simulation some data
+* `y` our normally distributed DV
+* `x1` a categorical IV
+* `x2` another categorical IV
+* `id` subject identifier
+```{r}
+set.seed(42)
+n_sub = 100
+data <- tibble(y = c(rnorm(n_sub,0), rnorm(n_sub,1),rnorm(n_sub,3),rnorm(n_sub,5)),
+            x1  = rep(c("A", "B"), each = n_sub*2),
+            x2 = rep(c("A", "B"), each = n_sub, 2),
+            id = rep(1:n_sub, 4)) %>%
+  mutate(id = as.factor(id))
+head(data)
+```
+
+### aov_car
+```{r}
+mod_car <- data %>%
+  aov_car(y ~ x1 + x2 + Error(id/x1:x2), data = .)
+mod_car
+```
+
+### aov_4
+```{r}
+mod_4 <- data %>%
+  aov_4(y ~ x1 * x2 + (x1*x2|id), data = .)
+mod_4
+```
+
+### mixed
+```{r}
+mod_mixed <- data %>%
+  mixed(y ~ x1 * x2 + (1|id), data = .)
+summary(mod_mixed)
+```
+
+
+### lmer
+```{r}
+mod_lmer <- data %>%
+  lmer(y ~ x1 * x2 + (1|id), data = .)
+summary(mod_lmer)
+```
+
+# Compare marginal means
+
+For x1
+```{r}
+emmeans(mod_car, ~x1)
+emmeans(mod_4, ~x1)
+emmeans(mod_mixed, ~x1)
+emmeans(mod_lmer, ~x1)
+```
+
+
+For x2
+```{r}
+emmeans(mod_car, ~x2)
+emmeans(mod_4, ~x2)
+emmeans(mod_mixed, ~x2)
+emmeans(mod_lmer, ~x2)
+```
+
+
+For the x1:x2 interaction
+```{r}
+emmeans(mod_car, ~x1*x2)
+emmeans(mod_4, ~x1*x2)
+emmeans(mod_mixed, ~x1*x2)
+emmeans(mod_lmer, ~x1*x2)
+```
