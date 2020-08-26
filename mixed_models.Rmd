@@ -14,10 +14,10 @@ require(afex)
 require(emmeans)
 ```
 
-## Simulation some data
+## Simulate some data
 * `y` our normally distributed DV
-* `x1` a categorical IV
-* `x2` another categorical IV
+* `x1` a categorical within-subjects IV
+* `x2` another categorical within-subjects IV
 * `id` subject identifier
 ```{r}
 set.seed(42)
@@ -29,6 +29,14 @@ data <- tibble(y = c(rnorm(n_sub,0), rnorm(n_sub,1),rnorm(n_sub,3),rnorm(n_sub,5
   mutate(id = as.factor(id))
 head(data)
 ```
+
+```{r}
+ggplot(data, aes(x1, y, group=x2, col=x2)) + 
+  geom_point(alpha=.5, position = position_jitterdodge()) +
+  geom_path(aes(x = x1, y = y, group = interaction(x2, id)), alpha=.15, position=position_dodge(width=.5)) +
+  theme_classic()
+```
+
 
 ### aov_car
 ```{r}
