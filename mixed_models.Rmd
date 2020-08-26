@@ -53,9 +53,10 @@ mod_4
 ```
 
 ### mixed
+Set `check_contrasts = FALSE` to prevent `mixed` from adjusting contrasts to `contr.sum`
 ```{r}
 mod_mixed <- data %>%
-  mixed(y ~ x1 * x2 + (1|id), data = .)
+  mixed(y ~ x1 * x2 + (1|id), data = ., check_contrasts = FALSE)
 summary(mod_mixed)
 ```
 
