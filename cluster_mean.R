@@ -32,6 +32,7 @@
 #' 10 -0.00634     1  0.280 -0.286 
 #'
 cluster_mean <- function(df, x, g, label=x, clobber=FALSE) {
+  require(dplyr)
   # set up new column names
   m_col = str_c(label, '_m')
   s_col = str_c(label, "_s")
@@ -43,7 +44,7 @@ cluster_mean <- function(df, x, g, label=x, clobber=FALSE) {
     if (col %in% names(df)) {
       if (clobber) {
         warning(str_c('Replacing column: ', col))
-        df <- df %>% select(-col)
+        df <- df %>% dplyr::select(-col)
       } else {
         stop(str_c("Created column [",col,"] already exists. Set clobber=TRUE to overwrite"))
       }
@@ -51,7 +52,7 @@ cluster_mean <- function(df, x, g, label=x, clobber=FALSE) {
   }
   # calculate cluster means
   dm <- df %>%
-    select(g, x) %>%
+    dplyr::select(g, x) %>%
     group_by(!!as.name(g)) %>%
     summarize(mreservedkey = mean(!!as.name(x), na.rm=TRUE))
   # add means to df, calculate cluster-centered values, then rename new columns
